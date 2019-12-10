@@ -62,7 +62,7 @@ namespace PipeServer
 
                 if (match == true)
                 {
-                    return "User succesfully logged in";
+                    return "User succesfully logged in.";
                 }
                 else
                 {
