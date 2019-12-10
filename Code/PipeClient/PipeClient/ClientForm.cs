@@ -311,5 +311,22 @@ namespace PipeClient
                 MessageBox.Show("Movie not found, please try again", "Could not Find Movie", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
+
+        private void ClientForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            try
+            {
+                // Ctrl + X to close appliactions
+                if (e.Control && e.Control && e.KeyCode == Keys.X)
+                {
+                    this.pipeClient.Disconnect();
+                    Application.Exit();
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

@@ -228,6 +228,7 @@
             this.Controls.Add(this.tbPipeName);
             this.Name = "ClientForm";
             this.Text = "PipeClient";
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ClientForm_KeyDown);
             this.ResumeLayout(false);
             this.PerformLayout();
 
