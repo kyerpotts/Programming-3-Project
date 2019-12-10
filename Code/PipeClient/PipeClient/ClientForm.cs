@@ -32,6 +32,8 @@ namespace PipeClient
         {
             this.InitializeComponent();
             this.CreateNewPipeClient();
+
+            this.KeyPreview = true;
         }
 
         // Method to create Pipe Client Object with message receive and disconnect parameters
@@ -316,8 +318,8 @@ namespace PipeClient
         {
             try
             {
-                // Ctrl + X to close appliactions
-                if (e.Control && e.Control && e.KeyCode == Keys.X)
+                // Ctrl + Q to close appliactions
+                if (e.Control && e.KeyCode == Keys.Q)
                 {
                     this.pipeClient.Disconnect();
                     Application.Exit();
