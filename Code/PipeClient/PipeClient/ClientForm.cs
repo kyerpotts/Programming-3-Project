@@ -21,6 +21,10 @@ namespace PipeClient
     {
         private PipeClient pipeClient;
 
+        private CSVReader csv = new CSVReader();
+
+        private List<Movies> movieList;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ClientForm"/> class.
         /// </summary>
@@ -68,6 +72,13 @@ namespace PipeClient
 
             ASCIIEncoding encoder = new ASCIIEncoding();
             string str = encoder.GetString(message, 0, message.Length);
+            if (str == "User succesfully logged in.")
+            {
+                this.BtnImportCSV.Enabled = true;
+                this.BtnShuffle.Enabled = true;
+                this.BtnSort.Enabled = true;
+                this.BtnSearch.Enabled = true;
+            }
 
             if (str == "close")
             {
@@ -159,6 +170,145 @@ namespace PipeClient
             catch (Exception)
             {
                 throw;
+            }
+        }
+
+        private void DisplayMovies()
+        {
+            this.LstOutput.Items.Clear();
+            foreach (Movies m in this.movieList)
+            {
+                this.LstOutput.Items.Add(m.Name);
+            }
+        }
+
+        private List<T> ShuffleMovies<T>(List<T> inputList)
+        {
+            List<T> randomList = new List<T>();
+
+            Random r = new Random();
+            int randomIndex = 0;
+            while (inputList.Count > 0)
+            {
+                randomIndex = r.Next(0, inputList.Count);
+                randomList.Add(inputList[randomIndex]);
+                inputList.RemoveAt(randomIndex);
+            }
+
+            return randomList;
+        }
+
+        private int SearchMovies(string search)
+        {
+            foreach (Movies m in this.movieList)
+            {
+                if (m.Name == search)
+                {
+                    return this.movieList.IndexOf(m);
+                }
+            }
+
+            return -1;
+        }
+
+        #region MergeSort
+        private List<Movies> MergeSort(List<Movies> unsorted)
+        {
+            if (unsorted.Count <= 1)
+            {
+                return unsorted;
+            }
+
+            List<Movies> right = new List<Movies>();
+            List<Movies> left = new List<Movies>();
+
+            int middle = unsorted.Count / 2;
+
+            for (int i = 0; i < middle; i++)
+            {
+                left.Add(unsorted[i]);
+            }
+
+            for (int i = middle; i < unsorted.Count; i++)
+            {
+                right.Add(unsorted[i]);
+            }
+
+            left = this.MergeSort(left);
+            right = this.MergeSort(right);
+            return this.Merge(left, right);
+        }
+
+        private List<Movies> Merge(List<Movies> left, List<Movies> right)
+        {
+            List<Movies> result = new List<Movies>();
+
+            while (left.Count > 0 || right.Count > 0)
+            {
+                if (left.Count > 0 && right.Count > 0)
+                {
+                    if (left.First().Id <= right.First().Id)
+                    {
+                        result.Add(left.First());
+                        left.Remove(left.First());
+                    }
+                    else
+                    {
+                        result.Add(right.First());
+                        right.Remove(right.First());
+                    }
+                }
+                else if (left.Count > 0)
+                {
+                    result.Add(left.First());
+                    left.Remove(left.First());
+                }
+                else if (right.Count > 0)
+                {
+                    result.Add(right.First());
+                    right.Remove(right.First());
+                }
+            }
+
+            return result;
+        }
+        #endregion
+
+        private void BtnImportCSV_Click(object sender, EventArgs e)
+        {
+            this.csv.ReadCSV();
+            this.movieList = new List<Movies>(this.csv.GetMovies());
+            this.DisplayMovies();
+        }
+
+        private void BtnShuffle_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                this.movieList = this.ShuffleMovies(this.movieList);
+                this.DisplayMovies();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private void BtnSort_Click(object sender, EventArgs e)
+        {
+            this.movieList = this.MergeSort(this.movieList);
+            this.DisplayMovies();
+        }
+
+        private void BtnSearch_Click(object sender, EventArgs e)
+        {
+            if (this.SearchMovies(this.tbSearch.Text) != -1)
+            {
+                this.LstOutput.SelectedIndex = this.SearchMovies(this.tbSearch.Text);
+            }
+            else
+            {
+                MessageBox.Show("Movie not found, please try again", "Could not Find Movie", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
     }

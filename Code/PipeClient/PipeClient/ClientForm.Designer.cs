@@ -38,6 +38,13 @@
             this.tbReceived = new System.Windows.Forms.TextBox();
             this.lbUserID = new System.Windows.Forms.Label();
             this.lbPassword = new System.Windows.Forms.Label();
+            this.LstOutput = new System.Windows.Forms.ListBox();
+            this.BtnImportCSV = new System.Windows.Forms.Button();
+            this.BtnShuffle = new System.Windows.Forms.Button();
+            this.BtnSort = new System.Windows.Forms.Button();
+            this.tbSearch = new System.Windows.Forms.TextBox();
+            this.BtnSearch = new System.Windows.Forms.Button();
+            this.lbSearchMovies = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // tbPipeName
@@ -129,11 +136,86 @@
             this.lbPassword.TabIndex = 9;
             this.lbPassword.Text = "Password:";
             // 
+            // LstOutput
+            // 
+            this.LstOutput.FormattingEnabled = true;
+            this.LstOutput.Location = new System.Drawing.Point(265, 25);
+            this.LstOutput.Name = "LstOutput";
+            this.LstOutput.Size = new System.Drawing.Size(180, 407);
+            this.LstOutput.TabIndex = 10;
+            // 
+            // BtnImportCSV
+            // 
+            this.BtnImportCSV.Enabled = false;
+            this.BtnImportCSV.Location = new System.Drawing.Point(468, 38);
+            this.BtnImportCSV.Name = "BtnImportCSV";
+            this.BtnImportCSV.Size = new System.Drawing.Size(135, 47);
+            this.BtnImportCSV.TabIndex = 11;
+            this.BtnImportCSV.Text = "Import CSV";
+            this.BtnImportCSV.UseVisualStyleBackColor = true;
+            this.BtnImportCSV.Click += new System.EventHandler(this.BtnImportCSV_Click);
+            // 
+            // BtnShuffle
+            // 
+            this.BtnShuffle.Enabled = false;
+            this.BtnShuffle.Location = new System.Drawing.Point(468, 90);
+            this.BtnShuffle.Name = "BtnShuffle";
+            this.BtnShuffle.Size = new System.Drawing.Size(135, 47);
+            this.BtnShuffle.TabIndex = 12;
+            this.BtnShuffle.Text = "Shuffle Data";
+            this.BtnShuffle.UseVisualStyleBackColor = true;
+            this.BtnShuffle.Click += new System.EventHandler(this.BtnShuffle_Click);
+            // 
+            // BtnSort
+            // 
+            this.BtnSort.Enabled = false;
+            this.BtnSort.Location = new System.Drawing.Point(468, 143);
+            this.BtnSort.Name = "BtnSort";
+            this.BtnSort.Size = new System.Drawing.Size(135, 47);
+            this.BtnSort.TabIndex = 13;
+            this.BtnSort.Text = "Sort Data";
+            this.BtnSort.UseVisualStyleBackColor = true;
+            this.BtnSort.Click += new System.EventHandler(this.BtnSort_Click);
+            // 
+            // tbSearch
+            // 
+            this.tbSearch.Location = new System.Drawing.Point(464, 274);
+            this.tbSearch.Name = "tbSearch";
+            this.tbSearch.Size = new System.Drawing.Size(135, 20);
+            this.tbSearch.TabIndex = 14;
+            // 
+            // BtnSearch
+            // 
+            this.BtnSearch.Enabled = false;
+            this.BtnSearch.Location = new System.Drawing.Point(464, 300);
+            this.BtnSearch.Name = "BtnSearch";
+            this.BtnSearch.Size = new System.Drawing.Size(135, 47);
+            this.BtnSearch.TabIndex = 15;
+            this.BtnSearch.Text = "Search";
+            this.BtnSearch.UseVisualStyleBackColor = true;
+            this.BtnSearch.Click += new System.EventHandler(this.BtnSearch_Click);
+            // 
+            // lbSearchMovies
+            // 
+            this.lbSearchMovies.AutoSize = true;
+            this.lbSearchMovies.Location = new System.Drawing.Point(461, 258);
+            this.lbSearchMovies.Name = "lbSearchMovies";
+            this.lbSearchMovies.Size = new System.Drawing.Size(78, 13);
+            this.lbSearchMovies.TabIndex = 16;
+            this.lbSearchMovies.Text = "Search Movies";
+            // 
             // ClientForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(249, 450);
+            this.ClientSize = new System.Drawing.Size(623, 450);
+            this.Controls.Add(this.lbSearchMovies);
+            this.Controls.Add(this.BtnSearch);
+            this.Controls.Add(this.tbSearch);
+            this.Controls.Add(this.BtnSort);
+            this.Controls.Add(this.BtnShuffle);
+            this.Controls.Add(this.BtnImportCSV);
+            this.Controls.Add(this.LstOutput);
             this.Controls.Add(this.lbPassword);
             this.Controls.Add(this.lbUserID);
             this.Controls.Add(this.tbReceived);
@@ -163,6 +245,13 @@
         private System.Windows.Forms.TextBox tbReceived;
         private System.Windows.Forms.Label lbUserID;
         private System.Windows.Forms.Label lbPassword;
+        private System.Windows.Forms.ListBox LstOutput;
+        private System.Windows.Forms.Button BtnImportCSV;
+        private System.Windows.Forms.Button BtnShuffle;
+        private System.Windows.Forms.Button BtnSort;
+        private System.Windows.Forms.TextBox tbSearch;
+        private System.Windows.Forms.Button BtnSearch;
+        private System.Windows.Forms.Label lbSearchMovies;
     }
 }
 

@@ -1,23 +1,27 @@
-﻿using Microsoft.Win32.SafeHandles;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿// <copyright file="PipeClient.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace PipeClient
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Runtime.InteropServices;
+    using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Win32.SafeHandles;
+
     /// <summary>
-    /// Allow pipe communication between a server and a client
+    /// Allow pipe communication between a server and a client.
     /// </summary>
     public class PipeClient
     {
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern SafeFileHandle CreateFile(
-           String pipeName,
+           string pipeName,
            uint dwDesiredAccess,
            uint dwShareMode,
            IntPtr lpSecurityAttributes,
@@ -26,9 +30,9 @@ namespace PipeClient
            IntPtr hTemplate);
 
         /// <summary>
-        /// Handles messages received from a server pipe
+        /// Handles messages received from a server pipe.
         /// </summary>
-        /// <param name="message">The byte message received</param>
+        /// <param name="message">The byte message received.</param>
         public delegate void MessageReceivedHandler(byte[] message);
 
         /// <summary>
@@ -36,9 +40,8 @@ namespace PipeClient
         /// </summary>
         public event MessageReceivedHandler MessageReceived;
 
-
         /// <summary>
-        /// Handles server disconnected messages
+        /// Handles server disconnected messages.
         /// </summary>
         public delegate void ServerDisconnectedHandler();
 
@@ -54,12 +57,12 @@ namespace PipeClient
         Thread readThread;
 
         /// <summary>
-        /// Is this client connected to a server pipe
+        /// Is this client connected to a server pipe.
         /// </summary>
         public bool Connected { get; private set; }
 
         /// <summary>
-        /// The pipe this client is connected to
+        /// The pipe this client is connected to.
         /// </summary>
         public string PipeName { get; private set; }
 
@@ -69,14 +72,16 @@ namespace PipeClient
         /// <param name="pipename">The name of the pipe to connect to.</param>
         public void Connect(string pipename)
         {
-            if (Connected)
+            if (this.Connected)
+            {
                 throw new Exception("Already connected to pipe server.");
+            }
 
-            PipeName = pipename;
+            this.PipeName = pipename;
 
-            handle =
+            this.handle =
                CreateFile(
-                  PipeName,
+                  this.PipeName,
                   0xC0000000, // GENERIC_READ | GENERIC_WRITE = 0x80000000 | 0x40000000
                   0,
                   IntPtr.Zero,
@@ -84,18 +89,20 @@ namespace PipeClient
                   0x40000000, // FILE_FLAG_OVERLAPPED
                   IntPtr.Zero);
 
-            //could not create handle - server probably not running
-            if (handle.IsInvalid)
-                return;
-
-            Connected = true;
-
-            //start listening for messages
-            readThread = new Thread(Read)
+            // could not create handle - server probably not running
+            if (this.handle.IsInvalid)
             {
-                IsBackground = true
+                return;
+            }
+
+            this.Connected = true;
+
+            // start listening for messages
+            this.readThread = new Thread(this.Read)
+            {
+                IsBackground = true,
             };
-            readThread.Start();
+            this.readThread.Start();
         }
 
         /// <summary>
@@ -103,25 +110,30 @@ namespace PipeClient
         /// </summary>
         public void Disconnect()
         {
-            if (!Connected)
+            if (!this.Connected)
+            {
                 return;
+            }
 
             // we're no longer connected to the server
-            Connected = false;
-            PipeName = null;
+            this.Connected = false;
+            this.PipeName = null;
 
-            //clean up resource
-            if (stream != null)
-                stream.Close();
-            handle.Close();
+            // clean up resource
+            if (this.stream != null)
+            {
+                this.stream.Close();
+            }
 
-            stream = null;
-            handle = null;
+            this.handle.Close();
+
+            this.stream = null;
+            this.handle = null;
         }
 
         void Read()
         {
-            stream = new FileStream(handle, FileAccess.ReadWrite, BUFFER_SIZE, true);
+            this.stream = new FileStream(this.handle, FileAccess.ReadWrite, BUFFER_SIZE, true);
             byte[] readBuffer = new byte[BUFFER_SIZE];
 
             while (true)
@@ -133,59 +145,66 @@ namespace PipeClient
                     try
                     {
                         // read the total stream length
-                        int totalSize = stream.Read(readBuffer, 0, 4);
+                        int totalSize = this.stream.Read(readBuffer, 0, 4);
 
                         // client has disconnected
                         if (totalSize == 0)
+                        {
                             break;
+                        }
 
                         totalSize = BitConverter.ToInt32(readBuffer, 0);
 
                         do
                         {
-                            int numBytes = stream.Read(readBuffer, 0, Math.Min(totalSize - bytesRead, BUFFER_SIZE));
+                            int numBytes = this.stream.Read(readBuffer, 0, Math.Min(totalSize - bytesRead, BUFFER_SIZE));
 
                             ms.Write(readBuffer, 0, numBytes);
 
                             bytesRead += numBytes;
-
-                        } while (bytesRead < totalSize);
-
+                        }
+                        while (bytesRead < totalSize);
                     }
                     catch
                     {
-                        //read error has occurred
+                        // read error has occurred
                         break;
                     }
 
-                    //client has disconnected
+                    // client has disconnected
                     if (bytesRead == 0)
+                    {
                         break;
+                    }
 
-                    //fire message received event
-                    if (MessageReceived != null)
-                        MessageReceived(ms.ToArray());
+                    // fire message received event
+                    if (this.MessageReceived != null)
+                    {
+                        this.MessageReceived(ms.ToArray());
+                    }
                 }
             }
 
             // if connected, then the disconnection was
             // caused by a server terminating, otherwise it was from
             // a call to Disconnect()
-            if (Connected)
+            if (this.Connected)
             {
-                //clean up resource
-                stream.Close();
-                handle.Close();
+                // clean up resource
+                this.stream.Close();
+                this.handle.Close();
 
-                stream = null;
-                handle = null;
+                this.stream = null;
+                this.handle = null;
 
                 // we're no longer connected to the server
-                Connected = false;
-                PipeName = null;
+                this.Connected = false;
+                this.PipeName = null;
 
-                if (ServerDisconnected != null)
-                    ServerDisconnected();
+                if (this.ServerDisconnected != null)
+                {
+                    this.ServerDisconnected();
+                }
             }
         }
 
@@ -199,10 +218,10 @@ namespace PipeClient
             try
             {
                 // write the entire stream length
-                stream.Write(BitConverter.GetBytes(message.Length), 0, 4);
+                this.stream.Write(BitConverter.GetBytes(message.Length), 0, 4);
 
-                stream.Write(message, 0, message.Length);
-                stream.Flush();
+                this.stream.Write(message, 0, message.Length);
+                this.stream.Flush();
                 return true;
             }
             catch
